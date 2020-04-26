@@ -11,6 +11,7 @@ import (
 
 	_ "github.com/nlpodyssey/spago/pkg/global"
 	"github.com/nlpodyssey/spago/pkg/mat/internal/asm/f64"
+	"github.com/nlpodyssey/spago/pkg/mat/internal/asm/f64/add_in_place"
 )
 
 var _ Matrix = &Dense{}
@@ -409,7 +410,8 @@ func (d *Dense) AddInPlace(other Matrix) Matrix {
 		panic("mat: matrices with not compatible size")
 	}
 	b := other.(*Dense)
-	f64.AxpyUnitary(1.0, b.data, d.data)
+	add_in_place.AddInPlace(b.data, d.data)
+	// f64.AxpyUnitary(1.0, b.data, d.data)
 	return d
 }
 
