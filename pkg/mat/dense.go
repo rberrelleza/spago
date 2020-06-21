@@ -6,10 +6,10 @@ package mat
 
 import (
 	"fmt"
-	"math"
-
 	_ "github.com/nlpodyssey/spago/pkg/global"
 	"github.com/nlpodyssey/spago/pkg/mat/internal/asm/f64"
+	"github.com/nlpodyssey/spago/pkg/mat/internal/mkl"
+	"math"
 )
 
 var _ Matrix = &Dense{}
@@ -523,52 +523,35 @@ func (d *Dense) Mul(other Matrix) Matrix {
 	switch b := other.(type) {
 	case *Dense:
 		if out.cols == 1 {
-			f64.GemvN(
-				uintptr(d.rows), // m
-				uintptr(d.cols), // n
-				1.0,             // alpha
-				d.data,          // a
-				uintptr(d.cols), // lda
-				b.data,          // x
-				1.0,             // incX
-				0.0,             // beta
-				out.data,        // y
-				1.0,             // incY
+			mkl.DgemvRowMajor(
+				false,
+				d.rows,   // m
+				d.cols,   // n
+				1.0,      // alpha
+				d.data,   // a
+				d.cols,   // lda
+				b.data,   // x
+				1.0,      // incX
+				0.0,      // beta
+				out.data, // y
+				1.0,      // incY
 			)
 		} else {
-			f64.DgemmSerial(
+			mkl.DgemmRowMajor(
 				false,
 				false,
 				d.rows,   // m
 				b.cols,   // n
 				d.cols,   // k
+				1.0,      // alpha
 				d.data,   // a
 				d.cols,   // lda
 				b.data,   // b
 				b.cols,   // ldb
+				1.0,      // beta
 				out.data, // c
 				out.cols, // ldc
-				1.0,      // alpha
 			)
-
-			/*
-				// parallel implementation
-				f64.Dgemm(
-					false,    // aTrans
-					false,    // bTrans
-					d.rows,   // m
-					b.cols,   // n
-					d.cols,   // k
-					1.0,      // alpha
-					d.data,   // a
-					d.cols,   // lda
-					b.data,   // b
-					b.cols,   // ldb
-					0.0,      // beta
-					out.data, // c
-					out.cols, // ldc
-				)
-			*/
 		}
 
 		return out
