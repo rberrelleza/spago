@@ -116,7 +116,36 @@ func Zaxpy(n int, alpha complex128, x []complex128, incx int, y []complex128, in
 //     trans=true      y := alpha*A**T*x + beta*y.
 func Dgemv(trans bool, m, n int, alpha float64, a []float64, lda int, x []float64, incx int, beta float64, y []float64, incy int) {
 	C.cblas_dgemv(
-		//cblasColMajor,
+		cblasColMajor,
+		cTrans(trans),
+		C.MKL_INT(m),
+		C.MKL_INT(n),
+		C.double(alpha),
+		(*C.double)(unsafe.Pointer(&a[0])),
+		C.MKL_INT(lda),
+		(*C.double)(unsafe.Pointer(&x[0])),
+		C.MKL_INT(incx),
+		C.double(beta),
+		(*C.double)(unsafe.Pointer(&y[0])),
+		C.MKL_INT(incy),
+	)
+}
+
+// Dgemv performs one of the matrix-vector operations
+//
+//  See: http://www.netlib.org/lapack/explore-html/dc/da8/dgemv_8f.html
+//
+//  See: https://software.intel.com/en-us/mkl-developer-reference-c-cblas-gemv
+//
+//     y := alpha*A*x + beta*y,   or   y := alpha*A**T*x + beta*y,
+//
+//  where alpha and beta are scalars, x and y are vectors and A is an
+//  m by n matrix.
+//     trans=false     y := alpha*A*x + beta*y.
+//
+//     trans=true      y := alpha*A**T*x + beta*y.
+func DgemvRowMajor(trans bool, m, n int, alpha float64, a []float64, lda int, x []float64, incx int, beta float64, y []float64, incy int) {
+	C.cblas_dgemv(
 		cblasRowMajor,
 		cTrans(trans),
 		C.MKL_INT(m),
@@ -207,7 +236,44 @@ func Dger(m, n int, alpha float64, x []float64, incx int, y []float64, incy int,
 //  an m by k matrix,  op( B )  a  k by n matrix and  C an m by n matrix.
 func Dgemm(transA, transB bool, m, n, k int, alpha float64, a []float64, lda int, b []float64, ldb int, beta float64, c []float64, ldc int) {
 	C.cblas_dgemm(
-		//cblasColMajor,
+		cblasColMajor,
+		cTrans(transA),
+		cTrans(transB),
+		C.MKL_INT(m),
+		C.MKL_INT(n),
+		C.MKL_INT(k),
+		C.double(alpha),
+		(*C.double)(unsafe.Pointer(&a[0])),
+		C.MKL_INT(lda),
+		(*C.double)(unsafe.Pointer(&b[0])),
+		C.MKL_INT(ldb),
+		C.double(beta),
+		(*C.double)(unsafe.Pointer(&c[0])),
+		C.MKL_INT(ldc),
+	)
+}
+
+// DgemmRowMajor performs one of the matrix-matrix operations
+//
+//  false,false:  C_{m,n} := α ⋅ A_{m,k} ⋅ B_{k,n}  +  β ⋅ C_{m,n}
+//  false,true:   C_{m,n} := α ⋅ A_{m,k} ⋅ B_{n,k}  +  β ⋅ C_{m,n}
+//  true, false:  C_{m,n} := α ⋅ A_{k,m} ⋅ B_{k,n}  +  β ⋅ C_{m,n}
+//  true, true:   C_{m,n} := α ⋅ A_{k,m} ⋅ B_{n,k}  +  β ⋅ C_{m,n}
+//
+//  see: http://www.netlib.org/lapack/explore-html/d7/d2b/dgemm_8f.html
+//
+//  see: https://software.intel.com/en-us/mkl-developer-reference-c-cblas-gemm
+//
+//     C := alpha*op( A )*op( B ) + beta*C,
+//
+//  where  op( X ) is one of
+//
+//     op( X ) = X   or   op( X ) = X**T,
+//
+//  alpha and beta are scalars, and A, B and C are matrices, with op( A )
+//  an m by k matrix,  op( B )  a  k by n matrix and  C an m by n matrix.
+func DgemmRowMajor(transA, transB bool, m, n, k int, alpha float64, a []float64, lda int, b []float64, ldb int, beta float64, c []float64, ldc int) {
+	C.cblas_dgemm(
 		cblasRowMajor,
 		cTrans(transA),
 		cTrans(transB),
