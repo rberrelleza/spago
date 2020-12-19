@@ -57,7 +57,7 @@ RUN mkdir /etc/ssl/certs/spago \
 # demo programs for named entities recognition (ner-server), model
 # importing (hugging_face_importer), and question answering
 # (bert_server).
-FROM scratch
+FROM debian:slim
 
 # Copy the user info from the Builder container.
 COPY --from=Builder /etc/passwd /etc/passwd

@@ -1,0 +1,10 @@
+name: spago
+services:
+  spago:
+    public: true
+    image: sangam14/spago:main
+    command: "/ner-server server --models=/tmp/spago --model-name=goflair-en-ner-fast-conll03-v0.4"
+    ports:
+    - 1987
+    volumes:
+    - /tmp/spago
