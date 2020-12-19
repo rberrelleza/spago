@@ -2,7 +2,8 @@ name: spago
 services:
   spago:
     public: true
-    image: sangam14/spago:main
+    image: okteto.dev/spago
+    build: .
     command: "/ner-server server --models=/tmp/spago --model-name=goflair-en-ner-fast-conll03-v0.4"
     ports:
     - 1987
