@@ -4,8 +4,9 @@ services:
     public: true
     image: okteto.dev/spago
     build: .
-    command: "/ner-server server --models=/tmp/spago --model-name=goflair-en-ner-fast-conll03-v0.4"
+    command: "/ner-server server --models=/tmp/spago --model-name=goflair-en-ner-fast-conll03-v0.4 --tls-disable"
     ports:
     - 1987
+    - 1976
     volumes:
     - /tmp/spago
